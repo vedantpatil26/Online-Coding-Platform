@@ -1,0 +1,65 @@
+Repl.it
+
+Monolithic architecture style 
+it consists of a execution service which includes all the features
+
+Step-0.1
+First we need to save a base file of all the programming languages we are working on in a storage like Amazon S3.
+
+Step-0.2
+Then bring all the programming languages we are working on to our server.Install nodejs,golang,etc on the AWS server
+
+Step-1
+The user need to initialize the repl.When the repl create request is sent the execution service receives the request after that it must copy the base image for the particular language selected over to a new location of the user
+
+Step-2
+It will take the user to the edit screen
+
+Step-3
+When it go to the edit screen it asks the execution service again asks for the code db for the user whether he is coming first time or already written a code we need to initialize a websocket connection between online ide and the execution service 
+
+Step-4
+The online ide send the request to the execution service that my replit id is 1 bring me the existing code.Then it goes to the S3 then copy all the file locally on the execution service and then send it back to the user.
+
+Step-5 
+It let the user edit/delete/remove the code it will edit it on the local server and then after a few time it should also edit the code or make the changes in the S3.We need to debounce the changes so that we dont need to make individual changes we can instead directly batch the changes and send it to the S3.
+Code is saved in three places local browser,execution service which contains the files and then S3.We need to save the code in S3 as when the VM dies after that we can again access the code from where we left thats the reason we have to use S3.
+
+Step-6
+When the run command is pressed then it goes to the execution service and then the code is runned on the execution service instead of the machine.The user can also send the command from the shell to execute the code.
+If we can run the command on the execution service from the shell it can cause the insecurity to the service.Execution service is basically a node.js server.When the execution service runs the code it then assign the website to a port suppose 3000 so that it can be run on the localhost
+
+Step-7
+When the user deletes the point just wait for a few seconds then u can push all the changes to S3 and remove the files from execution service.Stop all the lingering processes as the user has left the machine.
+
+Challenges:
+1.I need all the files in the execution service not on the UI and whenever we expand we can see the file in few seconds.We need all the files in the execution service as when the project runs it needs all the files and not only one file.The execution service send the file lazily to the user
+2.After editing the code it must reach back to the execution service and the S3 too.We can send just the difference between the updated and existing code or we can send the whole code again to overwrite.
+Just sending the difference gives advantage:
+a.)Less data
+b.)Multiple users can access the same file they can do pair or parallel programming
+3.Remote code execution must be safe
+4.Autoscaling
+
+CODE:
+Node.js
+socket.io
+Typescript
+Kubernetes
+Docker
+
+I will use PTY which is pseudo terminal if i have to access my terminal using other server then i can use this
+Xterm.js is a lib used to fetch and forward keystrokes to the server
+When we create a terminal on browser and write the command it then transforms into keystrokes then it is sent to the execution server and then it is sent to the PTY it understand and sends back the output
+
+Why I used container?
+Each container has its own port,filesystem,isolated code
+
+Kubernetes does the container orchestration
+In Kubernetes the nodes are the machines and pods are the containers which run in node
+service use to give the network access to the pod
+ingress controller ingress is incoming traffic and controller means controlling where the incoming traffic comes
+service does not provide path based routing i.e only one url and it will do load balancing but ingress controller is used to do the path based routing
+ingress is used to give the path to the service and ingress controller manages where to send the req to which ingress.
+Ingress controller is nothing but a combination of service and pod where service cant do the path routing so pod is used to check which ingress has the matching url
+
